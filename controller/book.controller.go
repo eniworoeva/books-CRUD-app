@@ -67,3 +67,27 @@ func GetBook() gin.HandlerFunc {
 		c.JSON(http.StatusOK, book)
 	}
 }
+
+
+func UpdateBook() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
+
+		bookId := c.Param("book_id")
+		var book model.Book
+
+		if err := c.BindJSON(&book); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		objectId, _ := primitive.ObjectIDFromHex(bookId)
+		filter := bson.M{"_id": objectId}
+
+		var updateObj primitive.D
+
+		
+
+	}
+}
