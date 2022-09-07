@@ -8,6 +8,7 @@ import (
 	"github.com/eniworoeva/books-CRUD-app/model"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/net/context"
@@ -44,5 +45,25 @@ func CreateBook() gin.HandlerFunc {
 			return
 		}
 		c.JSON(http.StatusCreated, result)
+	}
+}
+
+
+func GetBook() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
+
+		bookId := c.Param("book_id")
+		var book model.Book
+
+		objectId, _ := primitive.ObjectIDFromHex(bookId)
+
+		err := bookCollection.FindOne(ctx, bson.M{"_id": objectId}).Decode(&book)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error occured while fetching book."})
+			return
+		}
+		c.JSON(http.StatusOK, book)
 	}
 }
