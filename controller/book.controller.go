@@ -87,6 +87,17 @@ func UpdateBook() gin.HandlerFunc {
 
 		var updateObj primitive.D
 
+		if book.Author != nil {
+			updateObj = append(updateObj, bson.E{Key: "author", Value: book.Author})
+		}
+
+		if book.Title != nil {
+			updateObj = append(updateObj, bson.E{Key: "title", Value: book.Title})
+		}
+
+		if book.Description != nil {
+			updateObj = append(updateObj, bson.E{Key: "description", Value: book.Description})
+		}
 		
 
 	}
