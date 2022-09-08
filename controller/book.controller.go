@@ -126,3 +126,22 @@ func UpdateBook() gin.HandlerFunc {
 
 	}
 }
+
+func DeleteBook() gin.HandlerFunc {
+	return func (c *gin.Context)  {
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()	
+
+		bookId := c.Param("book_id")
+
+		objectId, _ := primitive.ObjectIDFromHex(bookId)
+
+		_, err := bookCollection.DeleteOne(ctx, bson.M{"_id": objectId})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"_id": objectId})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "Book deleted successfully"})
+	}
+}
