@@ -11,6 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/net/context"
 )
 
@@ -98,7 +99,30 @@ func UpdateBook() gin.HandlerFunc {
 		if book.Description != nil {
 			updateObj = append(updateObj, bson.E{Key: "description", Value: book.Description})
 		}
-		
+
+		book.Updated_at, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
+		updateObj = append(updateObj, bson.E{Key: "updated_at", Value: book.Updated_at})
+
+		upsert := true
+		opt := options.UpdateOptions{
+			Upsert: &upsert,
+		}
+
+		_ , err := bookCollection.UpdateOne(
+			ctx,
+			filter,
+			bson.D{
+				{Key: "$set", Value: updateObj},
+			},
+			&opt,
+		)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Book update failed"})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "Book updated successfully"})
 
 	}
 }
