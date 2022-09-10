@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"log"
 	"net/http"
 	"time"
 
@@ -143,5 +144,26 @@ func DeleteBook() gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, gin.H{"message": "Book deleted successfully"})
+	}
+}
+
+func GetAllBook() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
+
+		result, err := bookCollection.Find(context.TODO(), bson.M{}) 
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error occured while fetching book list"})
+			return
+		}
+
+		var allBooks []bson.M
+		if err := result.All(ctx, &allBooks); err != nil {
+			log.Fatal(err)
+		}
+
+		c.JSON(http.StatusOK, allBooks)
+
 	}
 }
