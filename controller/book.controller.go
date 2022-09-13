@@ -70,7 +70,6 @@ func GetBook() gin.HandlerFunc {
 	}
 }
 
-
 func UpdateBook() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
